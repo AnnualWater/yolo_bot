@@ -1,0 +1,31 @@
+/*
+coding: utf-8
+@Author:归年丶似水
+@Email:2448955276@qq.com
+@GitHub:github.com/AnnualWater
+ */
+body {
+    display: inline-block;
+    padding: 0;
+    font-family: 微软雅黑, ui-serif;
+}
+
+.frame {
+    background: peachpuff;
+    padding: 5px;
+    margin: 5px;
+}
+
+.frame tr {
+    background: rgba(235, 189, 22, 0.9);
+    padding: 5px;
+}
+
+.frame tr td {
+    padding: 0 5px 0 5px;
+    text-align: center;
+}
+
+.search {
+    padding: 2px;
+}

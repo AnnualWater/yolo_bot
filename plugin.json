@@ -1,0 +1,4 @@
+{
+  "plugins": ["nonebot_plugin_apscheduler"],
+  "plugin_dirs": ["yolo/plugins"]
+}
