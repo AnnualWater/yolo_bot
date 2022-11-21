@@ -6,10 +6,10 @@
 import re
 
 from nonebot import get_driver
-from nonebot.adapters.onebot.v11 import MessageSegment, Message, Event
+from nonebot.adapters.onebot.v11 import MessageSegment, MessageEvent, Event, Message
 from nonebot.matcher import Matcher
 from nonebot.params import CommandArg, Arg, ArgPlainText
-from nonebot.plugin.on import on_command
+from nonebot.plugin.on import on_startswith
 
 from .config import max_search
 from .get_music_list_image import get_music_list_image
@@ -17,15 +17,15 @@ from .search_music import search_music
 
 global_config = get_driver().config
 
-order = on_command("点歌")
+order = on_startswith(msg="点歌")
 music_list: dict[str, list[dict[str, str] | dict[str, str]]] = {}
 
 
 @order.handle()
-async def handle_first(matcher: Matcher, args: Message = CommandArg()):
-    plain_text = args.extract_plain_text()
-    if plain_text:
-        matcher.set_arg("search", args)
+async def handle_first(matcher: Matcher, event: MessageEvent):
+    args = event.raw_message.split(" ")
+    if len(args) > 1:
+        matcher.set_arg("search", Message(args[1]))
 
 
 @order.got("search", prompt="请输入关键词")
@@ -55,6 +55,9 @@ async def handle_search(e: Event, search: Message = Arg(), search_str=ArgPlainTe
 
 @order.got("music_id")
 async def handle_send_music(e: Event, music_id: Message = Arg(), music_id_str=ArgPlainText("music_id")):
+    if re.search("[退出|q]", music_id_str):
+        await order.finish()
+        return
     id_m = re.match('^[0-9]+$', music_id_str)
     if id_m is None:
         await order.reject("输入的歌曲ID有误，请重新输入")

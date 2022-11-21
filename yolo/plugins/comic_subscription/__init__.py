@@ -8,8 +8,7 @@ from nonebot.adapters.onebot.v11 import Message, Event, MessageSegment, MessageE
     ActionFailed
 from nonebot.internal.matcher import Matcher
 from nonebot.internal.params import Arg, ArgPlainText
-from nonebot.params import CommandArg
-from nonebot.plugin.on import on_command
+from nonebot.plugin.on import on_startswith, on_fullmatch
 from nonebot_plugin_apscheduler import scheduler
 
 from .config import scheduled_job_minute
@@ -85,15 +84,15 @@ async def comic_scheduled_check():
 
 
 # 番剧搜索
-comic_search = on_command("comic_search", aliases={"番剧搜索", "番剧"})
+comic_search = on_startswith(msg="番剧搜索")
 
 
 # 参数设定
 @comic_search.handle()
-async def handle_first(matcher: Matcher, args: Message = CommandArg()):
-    plain_text = args.extract_plain_text()
-    if plain_text:
-        matcher.set_arg("search", args)
+async def handle_first(matcher: Matcher, event: MessageEvent):
+    args = event.raw_message.split(" ")
+    if len(args) > 1:
+        matcher.set_arg("search", Message(args[1]))
 
 
 # 获取参数
@@ -114,16 +113,15 @@ class Parameter:
     指令解析类
     """
 
-    def __init__(self, event: MessageEvent, args: Message, requre_comic_id=True):
+    def __init__(self, event: MessageEvent, requre_comic_id=True):
         """
         生成对象并直接进行指令解析
         :param event:
-        :param args:
         :param requre_comic_id:
         """
         self.user_id = event.user_id
         self.group_id = event.group_id if isinstance(event, GroupMessageEvent) else None
-        plain_text = args.extract_plain_text()
+        plain_text = event.raw_message
         args = plain_text.split(" ")
         # 解析指令
         self.platform = "樱花"
@@ -147,8 +145,8 @@ class Parameter:
             pass
         if requre_comic_id:
             try:
-                self.comic_id = int(args[0])
-            except ValueError:
+                self.comic_id = int(args[1])
+            except (ValueError, IndexError):
                 self.err = "番剧ID解析失败"
                 return
         self.scheduled_type = "private"
@@ -169,13 +167,13 @@ class Parameter:
 
 
 # 番剧订阅
-comic_scheduled = on_command("comic_scheduled", aliases={"番剧订阅"})
+comic_scheduled = on_startswith(msg="番剧订阅")
 
 
 @comic_scheduled.handle()
-async def handle_first(bot: Bot, event: MessageEvent, args: Message = CommandArg()):
+async def handle_first(bot: Bot, event: MessageEvent):
     await comic_scheduled.send("正在获取番剧信息，请稍后...")
-    argv = Parameter(event, args)
+    argv = Parameter(event)
     if argv.err is not None:
         await comic_scheduled.finish(argv.err)
         return
@@ -203,12 +201,12 @@ async def handle_first(bot: Bot, event: MessageEvent, args: Message = CommandArg
 
 
 # 取消订阅
-comic_del = on_command("comic_del", aliases={"番剧删除", "番剧取消"})
+comic_del = on_startswith(msg=("番剧删除", "番剧取消"))
 
 
 @comic_del.handle()
-async def handle_first(bot: Bot, event: MessageEvent, args: Message = CommandArg()):
-    argv = Parameter(event, args)
+async def handle_first(bot: Bot, event: MessageEvent):
+    argv = Parameter(event)
     if argv.err is not None:
         await comic_del.finish(argv.err)
         return
@@ -226,12 +224,12 @@ async def handle_first(bot: Bot, event: MessageEvent, args: Message = CommandArg
 
 
 # 查询订阅列表
-comic_ls = on_command("comic_ls", aliases={"番剧列表", "订阅列表"})
+comic_ls = on_fullmatch(msg=("番剧列表", "订阅列表"))
 
 
 @comic_ls.handle()
-async def handle_first(event: MessageEvent, args: Message = CommandArg()):
-    argv = Parameter(event, args, requre_comic_id=False)
+async def handle_first(event: MessageEvent):
+    argv = Parameter(event, requre_comic_id=False)
     if argv.err is not None:
         await comic_del.finish(argv.err)
         return

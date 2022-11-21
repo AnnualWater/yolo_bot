@@ -45,10 +45,14 @@ async def _(event: MessageEvent):
     group = event.group_id if isinstance(event, GroupMessageEvent) else None
     if group is not None:
         # 如果是群聊
+        if group not in replies["group"]:
+            return
         items = replies["group"][group]
         await __do_check(items)
     else:
         # 如果是私聊
+        if user not in replies["private"]:
+            return
         items = replies["private"][user]
         await __do_check(items)
 
@@ -90,7 +94,7 @@ async def _(matcher: Matcher, bot: Bot, event: MessageEvent, args: Namespace = S
         await func(args=args, bot=bot, event=event, matcher=matcher)
         await custom_reply_command.finish()
 
-    if action in ["help", "ls"]:
+    if action in ["ls"]:
         if func is not None:
             await do_action()
         else:

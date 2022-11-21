@@ -34,29 +34,6 @@ class Handle:
             await bot.send_group_msg(group_id=args.conv["group"], message=message)
 
     @classmethod
-    async def help(cls, args: Namespace, bot: Bot, event: Event, matcher: Matcher):
-        """
-        帮助指令
-        :param args:
-        :param bot:
-        :param event:
-        :param matcher:
-        :return:
-        """
-        print(args)
-        help_msg = ""
-        if args.action == "None":
-            help_msg = ('Custom Reply帮助信息\n'
-                        '   help:帮助\n'
-                        '   ls:查看列表\n'
-                        '   add:添加\n'
-                        '   del:删除\n'
-                        '   键入指令>crm help -a [操作名]')
-        elif args.action == "ls":
-            help_msg = "ls_help"
-        await cls.reply(args, bot, help_msg)
-
-    @classmethod
     async def ls(cls, args: Namespace, bot: Bot, event: Event, matcher: Matcher):
         """
         查看列表指令
@@ -153,21 +130,20 @@ class Handle:
                                  response_type="group_private",
                                  create_user_id=args.user)
                 return
-                # 获取成员在群内的权限
             if not args.is_super_user:
                 # 获取成员在群内的信息
                 info = await bot.get_group_member_info(group_id=args.group, user_id=args.conv["user"])
                 if info["role"] not in ["owner", "admin"]:
                     await cls.reply(args, bot, "权限不足")
                     return
-                # 直接执行
-                add_custom_reply(message=str(args.message),
-                                 is_regex=args.regex,
-                                 command=args.command,
-                                 group_id=args.group,
-                                 response_type="group_private",
-                                 create_user_id=args.user)
-                return
+            # 直接执行
+            add_custom_reply(message=str(args.message),
+                             is_regex=args.regex,
+                             command=args.command,
+                             group_id=args.group,
+                             response_type="group",
+                             create_user_id=args.user)
+            return
 
     @classmethod
     async def rm(cls, args: Namespace, bot: Bot, event: Event, matcher: Matcher):
