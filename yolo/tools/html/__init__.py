@@ -79,7 +79,7 @@ async def screenshot(file_path, query: str):
     # 用pyppeteer打开
     browser = await launch(options={"headless": True})
     page = await browser.newPage()
-    await page.goto(url=os.path.abspath(file_path))
+    await page.goto(url=f"file:///{os.path.abspath(file_path)}")
     # 根据ID寻找指定元素截图
     container = await page.querySelector(query)
     image_byte = await container.screenshot()

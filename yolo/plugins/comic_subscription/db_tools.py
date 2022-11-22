@@ -24,9 +24,11 @@ def __find_first(session, group_id, create_user_id, comic_id, platform):
              .filter(ComicSubscriptionInfo.comic_id == comic_id)
              .filter(ComicSubscriptionInfo.platform == platform))
     if group_id == 0:
-        query = query.filter(ComicSubscriptionInfo.group_id == group_id)
+        query = query.filter(ComicSubscriptionInfo.create_user_id == create_user_id) \
+            .filter(ComicSubscriptionInfo.scheduled_type == "private")
     else:
-        query = query.filter(ComicSubscriptionInfo.create_user_id == create_user_id)
+        query = query.filter(ComicSubscriptionInfo.group_id == group_id) \
+            .filter(ComicSubscriptionInfo.scheduled_type == "group")
     return query.first()
 
 
@@ -138,9 +140,11 @@ def search_comic_subscription(create_user_id, group_id):
     session = get_session()
     query = session.query(ComicSubscriptionInfo)
     if group_id == 0:
-        query = query.filter(ComicSubscriptionInfo.group_id == group_id)
+        query = query.filter(ComicSubscriptionInfo.create_user_id == create_user_id) \
+            .filter(ComicSubscriptionInfo.scheduled_type == "private")
     else:
-        query = query.filter(ComicSubscriptionInfo.create_user_id == create_user_id)
+        query = query.filter(ComicSubscriptionInfo.group_id == group_id) \
+            .filter(ComicSubscriptionInfo.scheduled_type == "group")
     objs = query.all()
     session.close()
     return objs
