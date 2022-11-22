@@ -75,6 +75,8 @@ def add_comic_subscription(
     if cache_check_list is None:
         __reset_cache_check_list()
     else:
+        if (comic_id, platform) not in cache_check_list:
+            cache_check_list[(comic_id, platform)] = []
         cache_check_list[(comic_id, platform)].append(
             {"create_user_id": create_user_id, "group_id": group_id, "episode": episode})
     return "success"
