@@ -12,8 +12,7 @@ from nonebot.adapters.onebot.v11 import Bot, MessageEvent, GroupMessageEvent
 from nonebot.exception import ActionFailed
 from nonebot_plugin_apscheduler import scheduler
 
-from data.plugins.custom_reply.parser import del_group
-from .db_tools import add_group
+from .db_tools import add_group, del_group
 
 require("nonebot_plugin_apscheduler")
 require("db_sqlalchemy")

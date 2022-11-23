@@ -16,7 +16,7 @@ def add_group(group_id: int):
     session.close()
 
 
-def def_group(group_id: int):
+def del_group(group_id: int):
     session = get_session()
     group = session.query(CrazyKfcGroup).get(group_id)
     if group is not None:
