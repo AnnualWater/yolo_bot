@@ -1,4 +1,4 @@
 {
-  "plugins": ["nonebot_plugin_apscheduler"],
+  "plugins": ["nonebot_plugin_apscheduler","nonebot_plugin_word_bank2"],
   "plugin_dirs": ["yolo/plugins"]
 }
